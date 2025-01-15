@@ -1,3 +1,8 @@
+name = "HEPAnalysisTools"
+uuid = "ce685e8a-d42a-493f-8ceb-74ca424dbc78"
+authors = ["mfarring <michael.steven.farrington@cern.ch>"]
+version = "0.1.0"
+
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
