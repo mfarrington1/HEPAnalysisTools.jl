@@ -157,7 +157,7 @@ function plot_comparison(hist1, hist2, Title, input_xlabel, input_ylabel, hist1_
 
 end
 
-function multi_plot(hists, Title, input_xlabel, input_ylabel, hist_labels; scale="lin", normalize_hists=false, stack=false)
+function multi_plot(hists, Title, input_xlabel, input_ylabel, hist_labels; data_hist=nothing, data_label="Data", scale="lin", normalize_hists=false, stack=false)
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
@@ -178,8 +178,26 @@ function multi_plot(hists, Title, input_xlabel, input_ylabel, hist_labels; scale
         norm_hists = hists
     end
 
+    if data_hist !== nothing
+        if normalize_hists
+            data_hist_norm = normalize(data_hist)
+        else
+            data_hist_norm = data_hist
+        end
+        CairoMakie.scatter!(ax, data_hist_norm; label=data_label, color=:black)
+        CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true)
+
+
+        ratioax = CairoMakie.Axis(fig[2, 1], xlabel = input_xlabel, ylabel="Data/MC", tellwidth=true)
+        FHist.ratiohist!(ratioax, data_hist_norm/sum(norm_hists); color=CairoMakie.Makie.wong_colors()[2])
+        CairoMakie.ylims!(0.5, 1.5)
+        CairoMakie.linkxaxes!(ratioax, ax)
+        CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
+        CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
+    end
+
     if stack
-        stackedhist!(norm_hists, color=gaudi_colors, errorcolor=(:white, 0.0))
+        stackedhist!(ax, norm_hists, color=gaudi_colors, errorcolor=(:white, 0.0))
         elements = [PolyElement(polycolor = gaudi_colors[i]) for i in 1:length(hist_labels)]
         Legend(fig[1,2], elements, hist_labels, "Legend")
     else
