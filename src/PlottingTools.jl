@@ -1,7 +1,10 @@
-import CairoMakie
+using CairoMakie
 using ColorSchemes
 using FHist
 using JSON
+
+gaudi_colors = ["#cb181d", "#fa6a4a", "#2271b5", "#2271b5", "#bdd7e7", "#238b21", "#a1cf42",
+                    "#ff8c00", "#fee147"]
 
 #Store plots in a PDF
 function pdf_plot(hists, x_axis_labels, Titles; y_axis_labels=nothing, normalize_hists=true, ofile="kinematic_histograms.pdf")
@@ -165,7 +168,7 @@ function multi_plot(hists, Title, input_xlabel, input_ylabel, hist_labels; scale
         ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title)
 
     else
-        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title, yscale=log10)
+        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title, yscale=Makie.pseudolog10)
     end
 
     if normalize_hists
@@ -176,8 +179,8 @@ function multi_plot(hists, Title, input_xlabel, input_ylabel, hist_labels; scale
     end
 
     if stack
-        stackedhist!(norm_hists, color=cgrad(:linear_ternary_blue_0_44_c57_n256, length(norm_hists), categorical=true))
-        elements = [PolyElement(polycolor = cgrad(:linear_ternary_blue_0_44_c57_n256, length(norm_hists), categorical=true)[i]) for i in 1:length(hist_labels)]
+        stackedhist!(norm_hists, color=gaudi_colors, errorcolor=(:white, 0.0))
+        elements = [PolyElement(polycolor = gaudi_colors[i]) for i in 1:length(hist_labels)]
         Legend(fig[1,2], elements, hist_labels, "Legend")
     else
 
