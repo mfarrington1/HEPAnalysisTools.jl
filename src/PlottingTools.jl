@@ -3,10 +3,13 @@ using ColorSchemes
 using FHist
 using JSON
 
-gaudi_colors = ["#cb181d", "#fa6a4a", "#2271b5", "#2271b5", "#bdd7e7", "#238b21", "#a1cf42",
+gaudi_colors = ["#cb181d", "#fa6a4a", "#2271b5", "#bdd7e7", "#238b21", "#a1cf42",
                     "#ff8c00", "#fee147"]
 
-#Store plots in a PDF
+@doc raw"""
+    pdf_plot(hists::Vector{Union{Hist1D, Hist2D}}, x_axis_labels::Vector{String}, Titles::Vector{String}; y_axis_labels=nothing, normalize_hists=true, ofile="kinematic_histograms.pdf")
+    Loops throug the histograms in hists and plots them in a PDF with name `ofile`. If normalize_hist is set then the histogras are normalized.
+"""
 function pdf_plot(hists, x_axis_labels, Titles; y_axis_labels=nothing, normalize_hists=true, ofile="kinematic_histograms.pdf")
     
     #Check if we have the required number of labels and Titles
