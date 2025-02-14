@@ -175,14 +175,13 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
     if stack
         stackedhist!(ax, norm_hists, color=gaudi_colors, errorcolor=(:white, 0.0))
         elements = [PolyElement(polycolor = gaudi_colors[i]) for i in 1:length(hist_labels)]
-        Legend(fig[1,2], elements, hist_labels, "Legend")
     else
 
         for (i, hist) in enumerate(norm_hists)
-            CairoMakie.stephist!(ax, hist; label=hist_labels[i], clamp_bincounts=true)
+            CairoMakie.stephist!(ax, hist; clamp_bincounts=true)
             CairoMakie.errorbars!(ax, hist; whiskerwidth=6, clamp_errors=true)
         end
-        CairoMakie.axislegend()
+        elements = [LineElement(linecolor = CairoMakie.Makie.wong_colors()[i]) for i in 1:length(hist_labels)]
     end
 
     if data_hist !== nothing
@@ -192,9 +191,10 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
             data_hist_norm = data_hist
         end
 
-        CairoMakie.scatter!(ax, data_hist_norm; label=data_label, color=:black)
+        CairoMakie.scatter!(ax, data_hist_norm; color=:black)
+        elements = vcat(elements, MarkerElement(marker = :circle, markercolor = :black))
+        push!(hist_labels, data_label)
         CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true, color=:black)
-        CairoMakie.axislegend()
         ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel="Data/MC", tellwidth=true)
         FHist.ratiohist!(ratioax, data_hist_norm/sum(norm_hists); color=CairoMakie.Makie.wong_colors()[2])
         CairoMakie.ylims!(0.5, 1.5)
@@ -203,5 +203,6 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
         CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
     end
 
+    Legend(fig[1,2], elements, hist_labels, "Legend")
     CairoMakie.current_figure()
 end
