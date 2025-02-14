@@ -160,43 +160,16 @@ function plot_comparison(hist1, hist2, Title, input_xlabel, input_ylabel, hist1_
 
 end
 
-function multi_plot(hists, Title, input_xlabel, input_ylabel, hist_labels; data_hist=nothing, data_label="Data", scale="lin", normalize_hists=false, stack=false)
+function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false)
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-
-
-
-    if scale == "lin"
-        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title)
-
-    else
-        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title, yscale=Makie.pseudolog10)
-    end
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale)
 
     if normalize_hists
         norm_hists = [normalize(hist) for hist in hists]
-    
     else
         norm_hists = hists
-    end
-
-    if data_hist !== nothing
-        if normalize_hists
-            data_hist_norm = normalize(data_hist)
-        else
-            data_hist_norm = data_hist
-        end
-        CairoMakie.scatter!(ax, data_hist_norm; label=data_label, color=:black)
-        CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true)
-
-
-        ratioax = CairoMakie.Axis(fig[2, 1], xlabel = input_xlabel, ylabel="Data/MC", tellwidth=true)
-        FHist.ratiohist!(ratioax, data_hist_norm/sum(norm_hists); color=CairoMakie.Makie.wong_colors()[2])
-        CairoMakie.ylims!(0.5, 1.5)
-        CairoMakie.linkxaxes!(ratioax, ax)
-        CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
-        CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
     end
 
     if stack
@@ -209,8 +182,25 @@ function multi_plot(hists, Title, input_xlabel, input_ylabel, hist_labels; data_
             CairoMakie.stephist!(ax, hist; label=hist_labels[i], clamp_bincounts=true)
             CairoMakie.errorbars!(ax, hist; whiskerwidth=6, clamp_errors=true)
         end
-
         CairoMakie.axislegend()
+    end
+
+    if data_hist !== nothing
+        if normalize_hists
+            data_hist_norm = normalize(data_hist)
+        else
+            data_hist_norm = data_hist
+        end
+
+        CairoMakie.scatter!(ax, data_hist_norm; label=data_label, color=:black)
+        CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true, color=:black)
+        CairoMakie.axislegend()
+        ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel="Data/MC", tellwidth=true)
+        FHist.ratiohist!(ratioax, data_hist_norm/sum(norm_hists); color=CairoMakie.Makie.wong_colors()[2])
+        CairoMakie.ylims!(0.5, 1.5)
+        CairoMakie.linkxaxes!(ratioax, ax)
+        CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
+        CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
     end
 
     CairoMakie.current_figure()
