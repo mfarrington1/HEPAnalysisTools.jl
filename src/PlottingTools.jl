@@ -83,17 +83,11 @@ function pdf_plot(hists, x_axis_labels, Titles; y_axis_labels=nothing, normalize
     return
 end
 
-function plot_hist(hist, Title, input_xlabel, input_ylabel, hist_label; normalize_hist=true, scale="lin")
+function plot_hist(hist, title, xlabel, ylabel, hist_label; normalize_hist=true, yscale=identity)
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-
-    if scale == "lin"
-        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title)
-
-    else
-        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title, yscale=log10, limits=(130,400,1, 1e8))
-    end
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale)
 
     if normalize_hist
         hist_norm = normalize(hist)
@@ -108,19 +102,13 @@ function plot_hist(hist, Title, input_xlabel, input_ylabel, hist_label; normaliz
 end
 
 
-function plot_comparison(hist1, hist2, Title, input_xlabel, input_ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, scale="lin", plot_as_data=[false, false])
+function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, yscale=identity, plot_as_data=[false, false])
 
     #Plot the histograms
     
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-
-    if scale == "lin"
-        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title)
-
-    else
-        ax = CairoMakie.Axis(fig[1,1], xlabel=input_xlabel, ylabel=input_ylabel, title=Title, yscale=log10, limits=(130,400,1, 1e8))
-    end
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale)
 
     if normalize_hists
         hist1_norm = normalize(hist1)
