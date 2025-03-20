@@ -6,7 +6,7 @@ using JSON
 gaudi_colors = ["#cb181d", "#fa6a4a", "#2271b5", "#bdd7e7", "#238b21", "#a1cf42",
                     "#ff8c00", "#fee147"]
 
-@doc raw"""
+"""
     pdf_plot(hists::Vector{Union{Hist1D, Hist2D}}, x_axis_labels::Vector{String}, Titles::Vector{String}; y_axis_labels=nothing, normalize_hists=true, ofile="kinematic_histograms.pdf")
     Loops throug the histograms in hists and plots them in a PDF with name `ofile`. If normalize_hist is set then the histogras are normalized.
 """
@@ -83,11 +83,11 @@ function pdf_plot(hists, x_axis_labels, Titles; y_axis_labels=nothing, normalize
     return
 end
 
-function plot_hist(hist, title, xlabel, ylabel, hist_label; normalize_hist=true, yscale=identity)
+function plot_hist(hist, title, xlabel, ylabel; hist_label="", normalize_hist=true, yscale=identity, limits=(nothing, nothing))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale)
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
 
     if normalize_hist
         hist_norm = normalize(hist)
@@ -102,13 +102,13 @@ function plot_hist(hist, title, xlabel, ylabel, hist_label; normalize_hist=true,
 end
 
 
-function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, yscale=identity, plot_as_data=[false, false])
+function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, yscale=identity, plot_as_data=[false, false], limits=(nothing, nothing))
 
     #Plot the histograms
     
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale)
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
 
     if normalize_hists
         hist1_norm = normalize(hist1)
@@ -148,11 +148,11 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 
 end
 
-function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false)
+function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false, limits=(nothing, nothing))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale)
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
 
     if normalize_hists
         norm_hists = [normalize(hist) for hist in hists]
