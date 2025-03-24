@@ -15,7 +15,7 @@ else
 end
 
 makedocs(;
-         modules=[DarkQCD],
+         modules=[HEPAnalysisTools],
          format=DocumenterVitepress.MarkdownVitepress(; repo = repopath, devbranch = "main", devurl = "dev", deploy_url),
          # format = Documenter.HTML(
          #                          prettyurls = get(ENV, "CI", nothing) == "true",
