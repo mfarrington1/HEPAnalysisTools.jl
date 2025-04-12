@@ -83,11 +83,10 @@ function pdf_plot(hists, x_axis_labels, Titles; y_axis_labels=nothing, normalize
     return
 end
 
-function plot_hist(hist, title, xlabel, ylabel; hist_label="", normalize_hist=true, yscale=identity, limits=(nothing, nothing))
+function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=false, yscale=identity, limits=(nothing, nothing))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
 
     if normalize_hist
         hist_norm = normalize(hist)
@@ -95,9 +94,19 @@ function plot_hist(hist, title, xlabel, ylabel; hist_label="", normalize_hist=tr
         hist_norm = hist
     end
 
-    CairoMakie.stephist!(ax, hist_norm; label=hist_label)
-    CairoMakie.errorbars!(ax, hist_norm; whiskerwidth=6)
-    CairoMakie.axislegend()
+    if typeof(hist) == Hist1D{Float64}
+        ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
+        CairoMakie.stephist!(ax, hist_norm; label)
+        CairoMakie.errorbars!(ax, hist_norm; whiskerwidth=6)
+    
+    elseif typeof(hist) == Hist2D{Float64}
+        axis_heatmap, heatmap = CairoMakie.heatmap(fig[1,1], hist_norm, axis=(;title, xlabel, ylabel, ))
+    end
+
+    statbox!(fig, hist; position=(1,2))
+    if label !== nothing
+        CairoMakie.axislegend()
+    end
     CairoMakie.current_figure()
 end
 
