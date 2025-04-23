@@ -160,7 +160,7 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 
 end
 
-function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false, limits=(nothing, nothing))
+function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC")
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
@@ -194,9 +194,11 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
         CairoMakie.scatter!(ax, data_hist_norm; color=:black)
         elements = vcat(elements, MarkerElement(marker = :circle, markercolor = :black))
         push!(hist_labels, data_label)
-        CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true, color=:black)
-        ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel="Data/MC", tellwidth=true)
-        FHist.ratiohist!(ratioax, data_hist_norm/sum(norm_hists); color=CairoMakie.Makie.wong_colors()[2])
+        if plot_ratio
+            CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true, color=:black)
+            ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel=ratio_label, tellwidth=true)
+            FHist.ratiohist!(ratioax, data_hist_norm/sum(norm_hists); color=CairoMakie.Makie.wong_colors()[2])
+        end
         CairoMakie.ylims!(0.5, 1.5)
         CairoMakie.linkxaxes!(ratioax, ax)
         CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
