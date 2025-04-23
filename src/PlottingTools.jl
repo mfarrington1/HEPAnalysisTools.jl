@@ -198,11 +198,11 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
             CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true, color=:black)
             ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel=ratio_label, tellwidth=true)
             FHist.ratiohist!(ratioax, data_hist_norm/sum(norm_hists); color=CairoMakie.Makie.wong_colors()[2])
+            CairoMakie.ylims!(0.5, 1.5)
+            CairoMakie.linkxaxes!(ratioax, ax)
+            CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
+            CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
         end
-        CairoMakie.ylims!(0.5, 1.5)
-        CairoMakie.linkxaxes!(ratioax, ax)
-        CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
-        CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
     end
 
     Legend(fig[1,2], elements, hist_labels, "Legend")
