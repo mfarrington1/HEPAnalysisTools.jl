@@ -1,11 +1,24 @@
-using CairoMakie
-using ColorSchemes
-using FHist
-using JSON
-
 gaudi_colors = ["#cb181d", "#fa6a4a", "#2271b5", "#bdd7e7", "#238b21", "#a1cf42",
                     "#ff8c00", "#fee147"]
 
+const ATLASTHEME = Makie.MakieCore.Attributes(
+    Axis = (
+        xtickalign=true, ytickalign=true,
+        xticksmirrored=true, yticksmirrored=true,
+        xminortickalign=1, yminortickalign=1,
+        xticksize=10, yticksize=10,
+        xminorticksize=6, yminorticksize=6,
+        xgridvisible = false, ygridvisible = false,
+        xminorticksvisible = true, yminorticksvisible = true,
+        font = "Helvetica",
+    ),
+    Colorbar = (
+        colormap = :haline,
+        highclip = :red,
+        lowclip = :black
+    )
+)
+                    
 """
     pdf_plot(hists::Vector{Union{Hist1D, Hist2D}}, x_axis_labels::Vector{String}, Titles::Vector{String}; y_axis_labels=nothing, normalize_hists=true, ofile="kinematic_histograms.pdf")
     Loops throug the histograms in hists and plots them in a PDF with name `ofile`. If normalize_hist is set then the histogras are normalized.
@@ -98,13 +111,10 @@ function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=fa
         ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
         CairoMakie.stephist!(ax, hist_norm; label)
         CairoMakie.errorbars!(ax, hist_norm; whiskerwidth=6)
-        statbox!(fig, hist; position=(1,2))
-    
+            
     elseif typeof(hist) == Hist2D{Float64}
         axis_heatmap, heatmap = CairoMakie.heatmap(fig[1,1], hist_norm, axis=(;title, xlabel, ylabel, xscale, yscale); colorscale)
         CairoMakie.Colorbar(fig[1,2], heatmap; label=colorbar_label, scale=log10)
-        statbox!(fig, hist; position=(1,3))
-
     end
 
     if label !== nothing

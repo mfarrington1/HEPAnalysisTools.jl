@@ -8,3 +8,9 @@ CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
 FHist = "68837c9b-b678-4cd5-9925-8a54edc8f695"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+
+[compat]
+Makie = "0.22.4"
+Revise = "3.7.3"
