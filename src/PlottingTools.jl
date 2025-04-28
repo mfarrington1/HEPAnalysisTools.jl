@@ -158,7 +158,7 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 
     CairoMakie.axislegend()
 
-    ratioax = CairoMakie.Axis(fig[2, 1], xlabel = input_xlabel, ylabel=comp_label, tellwidth=true)
+    ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel=comp_label, tellwidth=true)
     FHist.ratiohist!(ratioax, hist2_norm/hist1_norm; color=CairoMakie.Makie.wong_colors()[2])
     CairoMakie.ylims!(0.5, 1.5)
     CairoMakie.linkxaxes!(ratioax, ax)
