@@ -1,24 +1,3 @@
-gaudi_colors = ["#cb181d", "#fa6a4a", "#2271b5", "#bdd7e7", "#238b21", "#a1cf42",
-                    "#ff8c00", "#fee147"]
-
-const ATLASTHEME = Makie.MakieCore.Attributes(
-    Axis = (
-        xtickalign=true, ytickalign=true,
-        xticksmirrored=true, yticksmirrored=true,
-        xminortickalign=1, yminortickalign=1,
-        xticksize=10, yticksize=10,
-        xminorticksize=6, yminorticksize=6,
-        xgridvisible = false, ygridvisible = false,
-        xminorticksvisible = true, yminorticksvisible = true,
-        font = "Helvetica",
-    ),
-    Colorbar = (
-        colormap = :haline,
-        highclip = :red,
-        lowclip = :black
-    )
-)
-                    
 """
     pdf_plot(hists::Vector{Union{Hist1D, Hist2D}}, x_axis_labels::Vector{String}, Titles::Vector{String}; y_axis_labels=nothing, normalize_hists=true, ofile="kinematic_histograms.pdf")
     Loops throug the histograms in hists and plots them in a PDF with name `ofile`. If normalize_hist is set then the histogras are normalized.
@@ -96,7 +75,7 @@ function pdf_plot(hists, x_axis_labels, Titles; y_axis_labels=nothing, normalize
     return
 end
 
-function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=false, xscale=identity, yscale=identity, colorbar_label="", colorscale=identity, limits=(nothing, nothing))
+function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=false, xscale=identity, yscale=identity, colorbar_label="", colorscale=identity, limits=(nothing, nothing), ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
@@ -113,18 +92,23 @@ function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=fa
         CairoMakie.errorbars!(ax, hist_norm; whiskerwidth=6)
             
     elseif typeof(hist) == Hist2D{Float64}
-        axis_heatmap, heatmap = CairoMakie.heatmap(fig[1,1], hist_norm, axis=(;title, xlabel, ylabel, xscale, yscale); colorscale)
+        ax, heatmap = CairoMakie.heatmap(fig[1,1], hist_norm, axis=(;title, xlabel, ylabel, xscale, yscale); colorscale)
         CairoMakie.Colorbar(fig[1,2], heatmap; label=colorbar_label, scale=log10)
     end
 
     if label !== nothing
         CairoMakie.axislegend()
     end
-    CairoMakie.current_figure()
+
+    if ATLAS_label !== nothing
+        add_ATLAS_internal!(ax, ATLAS_label; offset=ATLAS_label_offset)
+    end
+
+    current_figure()
 end
 
 
-function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, yscale=identity, plot_as_data=[false, false], limits=(nothing, nothing))
+function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, yscale=identity, plot_as_data=[false, false], limits=(nothing, nothing), ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
 
     #Plot the histograms
     
@@ -165,12 +149,15 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
     CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
     CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
 
+    if ATLAS_label !== nothing
+        add_ATLAS_internal!(ax, ATLAS_label; offset=ATLAS_label_offset)
+    end
 
     CairoMakie.current_figure()
 
 end
 
-function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC")
+function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
@@ -216,5 +203,10 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
     end
 
     Legend(fig[1,2], elements, hist_labels, "Legend")
+
+    if ATLAS_label !== nothing
+        add_ATLAS_internal!(ax, ATLAS_label; offset=ATLAS_label_offset)
+    end
+
     CairoMakie.current_figure()
 end
