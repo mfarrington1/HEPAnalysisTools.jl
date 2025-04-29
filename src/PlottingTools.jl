@@ -79,6 +79,7 @@ function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=fa
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
+    ax = nothing
 
     if normalize_hist
         hist_norm = normalize(hist)
