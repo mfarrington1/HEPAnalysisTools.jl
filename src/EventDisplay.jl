@@ -1,8 +1,8 @@
-function event_display(jets, largeR_jets, leptons; η_range =-2.5:0.5:2.5, ϕ_range =-3.15:0.5:3.15, jet_R = 0.4, largeR_jet_R = 1.0, element_labels=["Electrons", "Large R Jets", "Jets"])
+function event_display(jets, largeR_jets, leptons; η_range =-2.5:0.5:2.5, ϕ_range =-3.15:0.45:3.15, jet_R = 0.4, largeR_jet_R = 1.0, element_labels=["Electrons", "Large R Jets", "Jets"])
 
     CairoMakie.activate!(type="png")
-    fig = CairoMakie.Figure(size=(500,500))
-    ax = CairoMakie.Axis(fig[1, 1]; title="Event Display", xlabel="η", ylabel="ϕ", xticks=η_range, yticks=ϕ_range, aspect=DataAspect())
+    fig = CairoMakie.Figure(size=(500,600))
+    ax = CairoMakie.Axis(fig[1, 1]; title="Event Display", xlabel="η", ylabel="ϕ", xticks=η_range, yticks=ϕ_range, autolimitaspect=1, limits=((η_range[1], η_range[end]), (ϕ_range[1], ϕ_range[end])))
     el_plot = scatter!(ax, eta.(leptons), phi.(leptons), color=gaudi_colors[3], markersize=12, label="Leptons")
     largeRjet_plot = nothing
     jet_plot = nothing
