@@ -7,7 +7,7 @@ function set_ATLAS_theme()
 end
 
 AtlasTheme() = return Theme(
-        fonts = Attributes(:regular => "Nimbus", :bold => "Nimbus Bold", :italic => "Nimbus Italic", :bolditalic => "Nimbus Bold Italic"),
+        fonts = Attributes(:regular => "TeXGyreHeros", :bold => "TeXGyreHeros Bold", :italic => "TeXGyreHeros Italic", :bolditalic => "TeXGyreHeros Bold Italic"),
         Axis=(
             xtickalign=1, ytickalign=1,
             xticksmirrored=1, yticksmirrored=1,
@@ -28,7 +28,7 @@ AtlasTheme() = return Theme(
         
 )
 
-function add_ATLAS_internal!(ax, sec_text; offset=(30, -20))
+function add_ATLAS_internal!(ax, sec_text; offset=(250, -20))
     text!(ax, 0, 1; text=rich(rich("ATLAS  "; font = "Nimbus Bold Italic", fontsize=18), rich(sec_text; font = "Nimbus", fontsize=17)),
         align=(:left, :top), offset, space=:relative
     )
