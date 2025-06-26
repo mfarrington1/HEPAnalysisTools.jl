@@ -167,7 +167,7 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
         norm_hists = [normalize(hist) for hist in hists]
     elseif normalize_hists == "total"
         tot_integral = sum(integral(hist) for hist in hists)
-        norm_hists = [hist/tot_integral for hist in hists]
+        norm_hists = [hist * (1/tot_integral) for hist in hists]
     else
         norm_hists = hists
     end
