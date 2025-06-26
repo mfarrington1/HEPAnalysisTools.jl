@@ -157,14 +157,17 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 
 end
 
-function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_label="Data", yscale=identity, normalize_hists=false, stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
+function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_hist_style="scatter", data_label="Data", yscale=identity, normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
     ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
 
-    if normalize_hists
+    if normalize_hists == "individual"
         norm_hists = [normalize(hist) for hist in hists]
+    elseif normalize_hists == "total"
+        tot_integral = sum(integral(hist) for hist in hists)
+        norm_hists = [hist/tot_integral for hist in hists]
     else
         norm_hists = hists
     end
@@ -188,9 +191,15 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
             data_hist_norm = data_hist
         end
 
-        CairoMakie.scatter!(ax, data_hist_norm; color=:black)
-        elements = vcat(elements, MarkerElement(marker = :circle, markercolor = :black))
+        if data_hist_style == "scatter"
+            CairoMakie.scatter!(ax, data_hist_norm; color=:black)
+            elements = vcat(elements, MarkerElement(marker = :circle, markercolor = :black))
+        elseif data_hist_style == "stephist"
+            CairoMakie.stephist!(ax, data_hist_norm; label=data_label, color=:black)
+            elements = vcat(elements, LineElement(linecolor = :black))
+        end
         push!(hist_labels, data_label)
+
         if plot_ratio
             CairoMakie.errorbars!(ax, data_hist; whiskerwidth=6, clamp_errors=true, color=:black)
             ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel=ratio_label, tellwidth=true)
