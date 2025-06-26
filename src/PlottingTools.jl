@@ -185,7 +185,7 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
     end
 
     if data_hist !== nothing
-        if normalize_hists
+        if normalize_hists == "individual" || normalize_hists == "total"
             data_hist_norm = normalize(data_hist)
         else
             data_hist_norm = data_hist
