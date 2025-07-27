@@ -1,4 +1,4 @@
-name = "HEPAnalysisTools"
+name = "PlottingToolsHEP"
 uuid = "ce685e8a-d42a-493f-8ceb-74ca424dbc78"
 authors = ["mfarring <michael.steven.farrington@cern.ch>"]
 version = "0.1.0"

@@ -1,4 +1,4 @@
-module HEPAnalysisTools
+module PlottingToolsHEP
 using Makie, CairoMakie
 using ColorSchemes
 using FHist
