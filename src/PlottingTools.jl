@@ -75,7 +75,7 @@ function pdf_plot(hists, x_axis_labels, Titles; y_axis_labels=nothing, normalize
     return
 end
 
-function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=false, xscale=identity, yscale=identity, colorbar_label="", colorscale=identity, limits=(nothing, nothing), ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
+function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=false, xscale=identity, yscale=identity, xtickformat=Makie.automatic, colorbar_label="", colorscale=identity, limits=(nothing, nothing), ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
@@ -87,7 +87,7 @@ function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=fa
     end
 
     if typeof(hist) == Hist1D{Float64}
-        ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
+        ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits, xtickformat)
         CairoMakie.stephist!(ax, hist_norm; label)
         CairoMakie.errorbars!(ax, hist_norm; whiskerwidth=6)
             
@@ -108,13 +108,13 @@ function plot_hist(hist, title, xlabel, ylabel; label=nothing, normalize_hist=fa
 end
 
 
-function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, yscale=identity, plot_as_data=[false, false], limits=(nothing, nothing), ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
+function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2_label, comp_label; normalize_hists=true, yscale=identity, xtickformat=Makie.automatic, plot_as_data=[false, false], limits=(nothing, nothing), ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
 
     #Plot the histograms
     
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits, xtickformat)
 
     if normalize_hists
         hist1_norm = normalize(hist1)
@@ -157,11 +157,12 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 
 end
 
-function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_hist_style="scatter", data_label="Data", yscale=identity, normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
+function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_hist_style="scatter", data_label="Data", yscale=identity, xtickformat=Makie.automatic,
+     normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits, xtickformat)
 
     if normalize_hists == "individual"
         norm_hists = [normalize(hist) for hist in hists]
@@ -209,6 +210,71 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
             CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
             CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/6))
         end
+    end
+
+    Legend(fig[1,2], elements, hist_labels, "Legend")
+
+    if ATLAS_label !== nothing
+        add_ATLAS_internal!(ax, ATLAS_label; offset=ATLAS_label_offset)
+    end
+
+    CairoMakie.current_figure()
+end
+
+function plot_signal_vs_background(signal_hists, bkg_hists, title, xlabel, ylabel, signal_labels, bkg_labels; yscale=identity, normalize_hists="", stack=false, limits=(nothing, nothing), plot_s_sqrt_b=true, ATLAS_label=nothing, ATLAS_label_offset=(200, -20))
+    CairoMakie.activate!(type = "png")
+    fig = CairoMakie.Figure()
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits)
+
+    if normalize_hists == "total"
+        tot_bkg_integral = sum(integral(hist) for hist in bkg_hists)
+        bkg_hists_norm = [hist * (1/tot_bkg_integral) for hist in bkg_hists]
+
+        signal_hists_norm = [normalize(hist) for hist in signal_hists]
+    else
+        bkg_hists_norm = bkg_hists
+        signal_hists_norm = signal_hists
+    end
+
+    if stack
+        stackedhist!(ax, bkg_hists_norm, color=gaudi_colors, errorcolor=(:white, 0.0))
+        elements = [PolyElement(polycolor = gaudi_colors[i]) for i in 1:length(bkg_labels)]
+    else
+
+        for hist in enumerate(bkg_hists)
+            CairoMakie.stephist!(ax, hist; clamp_bincounts=true)
+            CairoMakie.errorbars!(ax, hist; whiskerwidth=6, clamp_errors=true)
+        end
+
+        sum_bkg = sum(bkg_hists_norm)
+        CairoMakie.hist!(ax, sum_bkg; color=(:gray, 0.3))
+        elements = [LineElement(linecolor = CairoMakie.Makie.wong_colors()[i]) for i in 1:length(bkg_labels)]
+        elements = vcat(elements, PolyElement(polycolor = (:gray, 0.3)))
+        push!(bkg_labels, "Total Bkg")
+    end
+
+    if plot_s_sqrt_b
+        ratioax = CairoMakie.Axis(fig[2, 1]; xlabel, ylabel=L"\fontfamily{TeXGyreHeros} S / \sqrt{B}", tellwidth=true)
+        significance_hist = Hist1D(; binedges=binedges(signal_hists_norm[1]))
+
+        for (ibin, center) in enumerate(bincenters(significane_hist)[1:end-1])
+            tot_signal = 0
+            for hist in signal_hists_norm
+                tot_signal += sum(bincounts(hist))[ibin:end]
+            end
+
+            tot_bkg = 0
+            for hist in bkg_hists_norm
+                tot_bkg += sum(bincounts(hist))[ibin:end]
+            end
+
+            atomic_push!(significance_hist, center, tot_signal/sqrt(tot_bkg))
+        end
+
+        stephist!(ragtioax, significance_hist; color=CairoMakie.Makie.wong_colors()[2])
+        CairoMakie.linkxaxes!(ratioax, ax)
+        CairoMakie.hidexdecorations!(ax; minorticks=false, ticks=false)
+        CairoMakie.rowsize!(fig.layout, 2, CairoMakie.Makie.Relative(1/5))
     end
 
     Legend(fig[1,2], elements, hist_labels, "Legend")
