@@ -158,7 +158,8 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 end
 
 function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_hist_style="scatter", data_label="Data", yscale=identity, xtickformat=Makie.automatic,
-     normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20), legend_align=(valign=0.95, halign=0.95))
+     normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20), legend_align=(valign=0.95, halign=0.95),
+    plot_errors = true)
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
@@ -180,7 +181,9 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
 
         for (i, hist) in enumerate(norm_hists)
             CairoMakie.stephist!(ax, hist; clamp_bincounts=true)
-            CairoMakie.errorbars!(ax, hist; whiskerwidth=6, clamp_errors=true)
+            if plot_errors
+                CairoMakie.errorbars!(ax, hist; whiskerwidth=6, clamp_errors=true)
+            end
         end
         elements = [LineElement(linecolor = CairoMakie.Makie.wong_colors()[i]) for i in 1:length(hist_labels)]
     end
