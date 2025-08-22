@@ -4,6 +4,7 @@ using ColorSchemes
 using FHist
 using JSON
 using LorentzVectorHEP
+using MathTeXEngine
 
 include("./PlottingTools.jl")
 export pdf_plot, plot_hist, plot_comparison, multi_plot

@@ -3,11 +3,12 @@ gaudi_colors = ["#cb181d", "#fa6a4a", "#2271b5", "#bdd7e7", "#238b21", "#a1cf42"
 
 
 function set_ATLAS_theme()
+    set_texfont_family!(FontFamily("TeXGyreHeros"))
     set_theme!(AtlasTheme())
 end
 
 AtlasTheme() = return Theme(
-        fonts = Attributes(:regular => "TeXGyreHeros", :bold => "TeXGyreHeros Bold", :italic => "TeXGyreHeros Italic", :bolditalic => "TeXGyreHeros Bold Italic"),
+        fonts = Attributes(:regular => "Nimbus", :bold => "Nimbus Bold", :italic => "Nimbus Italic", :bolditalic => "Nimbus Bold Italic"),
         Axis=(
             xtickalign=1, ytickalign=1,
             xticksmirrored=1, yticksmirrored=1,
@@ -28,8 +29,8 @@ AtlasTheme() = return Theme(
         
 )
 
-function add_ATLAS_internal!(ax, sec_text; offset=(250, -20))
-    text!(ax, 0, 1; text=rich(rich("ATLAS  "; font = "Nimbus Bold Italic", fontsize=18), rich(sec_text; font = "Nimbus", fontsize=17)),
+function add_ATLAS_internal!(ax, sec_text; offset=(250, -20), fontsize=20)
+    text!(ax, 0, 1; text=rich(rich("ATLAS  "; font = "Nimbus Bold Italic", fontsize), rich(sec_text; font = "Nimbus", fontsize=(fontsize-1))),
         align=(:left, :top), offset, space=:relative
     )
 
