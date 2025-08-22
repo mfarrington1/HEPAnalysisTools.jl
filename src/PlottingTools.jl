@@ -158,7 +158,7 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 end
 
 function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_hist_style="scatter", data_label="Data", yscale=identity, xtickformat=Makie.automatic,
-     normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20))
+     normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20), legend_align=(valign=0.95, halign=0.95))
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
@@ -212,7 +212,7 @@ function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing
         end
     end
 
-    Legend(fig[1,2], elements, hist_labels, "Legend")
+    Legend(fig[1,1], elements, hist_labels, tellheight=false, tellwidth=false, valign = legend_align.valign, halign = legend_align.halign)
 
     if ATLAS_label !== nothing
         add_ATLAS_internal!(ax, ATLAS_label; offset=ATLAS_label_offset)
