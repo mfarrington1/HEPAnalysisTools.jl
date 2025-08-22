@@ -157,13 +157,13 @@ function plot_comparison(hist1, hist2, title, xlabel, ylabel, hist1_label, hist2
 
 end
 
-function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_hist_style="scatter", data_label="Data", yscale=identity, xtickformat=Makie.automatic,
+function multi_plot(hists, title, xlabel, ylabel, hist_labels; data_hist=nothing, data_hist_style="scatter", data_label="Data", yscale=identity, xticks=Makie.automatic,
      normalize_hists="", stack=false, limits=(nothing, nothing), plot_ratio=false, ratio_label="Data/MC", ATLAS_label=nothing, ATLAS_label_offset=(30, -20), legend_align=(valign=0.95, halign=0.95),
     plot_errors = true)
 
     CairoMakie.activate!(type = "png")
     fig = CairoMakie.Figure()
-    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits, xtickformat)
+    ax = CairoMakie.Axis(fig[1,1]; xlabel, ylabel, title, yscale, limits, xticks)
 
     if normalize_hists == "individual"
         norm_hists = [normalize(hist) for hist in hists]
